@@ -8,6 +8,7 @@ from telegram.ext import (
     ContextTypes,
     filters
 )
+from pymongo import MongoClient
 import datetime
 import re
 import os
@@ -15,23 +16,33 @@ import os
 # CONFIGURACIÓN PRINCIPAL
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+MONGO_URI = os.getenv("MONGO_URI")
 
-if not GEMINI_API_KEY or not TELEGRAM_BOT_TOKEN:
-    raise ValueError("⚠️ Faltan las variables de entorno GEMINI_API_KEY o TELEGRAM_BOT_TOKEN")
+if not GEMINI_API_KEY or not TELEGRAM_BOT_TOKEN or not MONGO_URI:
+    raise ValueError("⚠️ Faltan las variables de entorno GEMINI_API_KEY, TELEGRAM_BOT_TOKEN o MONGO_URI")
 
+# Configurar Gemini
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Crear carpeta para guardar historiales si no existe
-if not os.path.exists("historiales"):
-    os.makedirs("historiales")
+# Conectar a MongoDB
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["bot_turistico"]
+conversaciones = db["historiales"]
 
-def guardar_historial(usuario, mensaje_usuario, respuesta_bot):
-    """Guarda la conversación en un archivo separado por usuario"""
-    nombre_archivo = f"historiales/historial_{usuario}.txt"
-    with open(nombre_archivo, "a", encoding="utf-8") as archivo:
+def guardar_historial(usuario, mensaje_usuario, respuesta_bot, sentimiento):
+    """Guarda la conversación del usuario en MongoDB"""
+    try:
         fecha = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        archivo.write(f"[{fecha}] Usuario ({usuario}): {mensaje_usuario}\n")
-        archivo.write(f"[{fecha}] Bot: {respuesta_bot}\n\n")
+        conversaciones.insert_one({
+            "usuario": usuario,
+            "fecha": fecha,
+            "mensaje_usuario": mensaje_usuario,
+            "respuesta_bot": respuesta_bot,
+            "sentimiento": sentimiento
+        })
+        print(f"✅ Historial guardado correctamente para {usuario}")
+    except Exception as e:
+        print(f"❌ Error al guardar historial: {e}")
 
 
 async def analizar_sentimiento(texto: str) -> str:
@@ -79,6 +90,7 @@ async def generar_respuesta(prompt: str, categoria: str, incluir_maps: bool) -> 
 
     return response.text.strip()
 
+
 # FUNCIONES PRINCIPALES
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -118,7 +130,7 @@ async def boton(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🤖 *Bot Turístico con IA (Gemini 2.5 Flash)*\n\n"
             "Desarrollado con Python y Telegram Bot API.\n"
             "Ofrece información sobre destinos, gastronomía y actividades.\n"
-            "Incluye análisis de sentimientos y registro de historial por usuario.\n"
+            "Incluye análisis de sentimientos y registro de historial en MongoDB.\n"
             "_Proyecto educativo del Instituto Tecnológico Universitario._",
             parse_mode="Markdown"
         )
@@ -155,10 +167,10 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
             respuesta
         )
 
-        # Guardar historial del usuario
-        guardar_historial(usuario, prompt, respuesta)
+        # Guardar historial del usuario en MongoDB
+        guardar_historial(usuario, prompt, respuesta, sentimiento)
 
-        # Evitar errores por texto largo
+        # Enviar respuesta en partes si es muy larga
         MAX_LENGTH = 4000
         partes = [respuesta[i:i + MAX_LENGTH] for i in range(0, len(respuesta), MAX_LENGTH)]
         for parte in partes:
@@ -169,15 +181,16 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error: {e}")
 
 
-# CONFIGURACIÓN
+# CONFIGURACIÓN PRINCIPAL
 def main():
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(boton))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, responder))
 
-    print("🤖 Bot turístico en marcha")
+    print("🤖 Bot turístico en marcha con almacenamiento en MongoDB")
     app.run_polling()
+
 
 # EJECUCIÓN
 if __name__ == "__main__":
