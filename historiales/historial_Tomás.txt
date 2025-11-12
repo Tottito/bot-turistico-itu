@@ -1,0 +1,21 @@
+[12/11/2025 14:49:03] Usuario (Tomás): Mendoza, Argentina
+[12/11/2025 14:49:03] Bot: 🙂 Entendido.
+
+¡Excelente elección! 🍷 La gastronomía mendocina es un festín para los sentidos. Imprescindible probar nuestras empanadas 🥟, con su carne cortada a cuchillo y cocidas al horno de barro.
+
+Por supuesto, el asado a la parrilla, maridado con un exquisito Malbec local, es una experiencia culinaria inigualable. No te pierdas el tradicional chivo a la llama 🐐, un verdadero clásico regional. ¡Y para el postre, dulces de membrillo o uva! ¡Un viaje de sabores que recordarás!
+
+[12/11/2025 14:56:54] Usuario (Tomás): Que comida me recomendas para comer en Guatemala
+[12/11/2025 14:56:54] Bot: 🙂 Entendido.
+
+¡En Guatemala te espera un festín de sabores ancestrales! 🇬🇹 No puedes irte sin probar el **Pepián**, un estofado tradicional de carne o pollo con un recado espeso de chiles y semillas, ¡una explosión deliciosa! 🌶️
+
+También te recomiendo el **Kaq'ik**, una exquisita sopa de pavo maya, y el **Jocón**, pollo en salsa verde. Para algo más casual, los **Tamales** son infaltables. Y de postre, prueba los **Rellenitos de Plátano**, ¡una dulzura única! 🍌 ¡Prepara tu paladar!
+
+[12/11/2025 14:57:33] Usuario (Tomás): Y me podes mandar el link de Google Maps del mejor lugar para comer en argentina Mendoza porfavor
+[12/11/2025 14:57:33] Bot: 🙂 Entendido.
+
+¡Claro! 🍽️ Para una inmersión culinaria top en Mendoza, donde la cocina de autor se fusiona con el paisaje vitivinícola, te sugiero **Zuccardi Piedra Infinita Cocina**. Disfrutarás de un menú maridado excepcional, celebrando los sabores de la región en un entorno espectacular. ¡Pura magia! ✨
+
+https://www.google.com/maps/search/?api=1&query=Zuccardi+Piedra+Infinita+Cocina
+
